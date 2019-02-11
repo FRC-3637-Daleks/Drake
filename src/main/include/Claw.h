@@ -11,7 +11,7 @@ Claw(WPI_TalonSRX *clawMotor, Servo *clawServo, AnalogInput *ballLimit, float cl
 
 void OpenServo();
 void ClosedServo();
-void GetBall();
+void RetrieveBall();
 void EjectBall();
 
 }

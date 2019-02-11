@@ -6,27 +6,25 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
-double newvar = 90;
-bool checkersIsfun = false;
+//double newvar = 90;
+//bool checkersIsfun = false;
 
 void Robot::RobotInit() {
-  //servo1             = new Servo(SERVO_MOTOR);
   leftDohickey       = new Joystick(LEFT_JOYSTICK);
   rightDohickey      = new Joystick(RIGHT_JOYSTICK);
   ps4                = new XboxController(XBOX_CONTROLLER);
-  nerfSparkyItsOP    = new CANSparkMax(1, rev::CANSparkMax::MotorType::kBrushless);
-  rawrXDTalon        = new WPI_TalonSRX(2);
-  sparkEncoderboi    = new CANEncoder(*nerfSparkyItsOP);
-  potInput           = new AnalogInput(THEBIGPOT);
-  pot                = new AnalogPotentiometer(potInput, 360, 30);
+  //nerfSparkyItsOP    = new CANSparkMax(1, rev::CANSparkMax::MotorType::kBrushless);
+  //rawrXDTalon        = new WPI_TalonSRX(2);
+  //sparkEncoderboi    = new CANEncoder(*nerfSparkyItsOP);
+  //potInput           = new AnalogInput(THEBIGPOT);
+  //pot                = new AnalogPotentiometer(potInput, 360, 30);
   arm                = new Arm(shoulderMotor, eblowMotor, turretMotor, turretPot, ARM_CAMERA);
   claw               = new Claw(clawMotor, clawServo, ballLimit, CLAW_CAMERA);
 
-)
+}
   //forwardLimitSwitch = new CANDigitalInput(*nerfSparkyItsOP, CANDigitalInput::LimitSwitch::kForward, CANDigitalInput::LimitSwitchPolarity::kNormallyOpen);
   //reverseLimitSwitch = new CANDigitalInput(*nerfSparkyItsOP, CANDigitalInput::LimitSwitch::kReverse, CANDigitalInput::LimitSwitchPolarity::kNormallyOpen);
-  // iSmokePot                = new AnalogPotentiometer(, 1.0, 0.0);
-}
+  
 
 void Robot::RobotPeriodic() {}
 
@@ -62,16 +60,6 @@ void Robot::TeleopPeriodic() {
 
   nerfSparkyItsOP->Set(.25 * newvar);
   */
-
-
-  //std::cout << rightDohickey->GetButton(frc::Joystick::ButtonType::kTriggerButton) << "\n";
-  nerfSparkyItsOP->Set(leftDohickey->GetY()*.2);
-  //std::cout << nerfSparkyItsOP ->GetBusVoltage() << "\n";
-  //std::cout << nerfSparkyItsOP ->GetOutputCurrent() << "hello\n";
-  rawrXDTalon->Set(rightDohickey->GetY()*.5);
-  std::cout << rawrXDTalon->GetOutputCurrent() << "boioiiii\n";
-  //servo1->SetAngle(newvar);
-  //std::cout<<servo1->GetAngle()<< "\n";
 
 }
 
