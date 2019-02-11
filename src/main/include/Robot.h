@@ -26,8 +26,6 @@ class Robot : public TimedRobot {
   void TestPeriodic() override;
   
   enum Joysticks {LEFT_JOYSTICK = 0, RIGHT_JOYSTICK, XBOX_CONTROLLER};
-  //enum Servos    {SERVO_MOTOR = 0};
-  //enum AnalogInputs    {THEBIGPOT};
 
   Joystick *leftDohickey, *rightDohickey; 
   XboxController *ps4;
@@ -59,11 +57,7 @@ class Robot : public TimedRobot {
   //#define ballPickUpX = 279;
   //#define ballPickUpY = 165;
   #define discLoadHeight = 381;
-  
-  
 
-
-  
   //CANDigitalInput *forwardLimitSwitch, *reverseLimitSwitch;
   //Servo *servo1;
 
