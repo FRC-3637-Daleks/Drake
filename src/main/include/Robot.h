@@ -58,10 +58,6 @@ class Robot : public TimedRobot {
   //#define ballPickUpY = 165;
   #define discLoadHeight = 381;
 
-  //CANDigitalInput *forwardLimitSwitch, *reverseLimitSwitch;
-  //Servo *servo1;
-
-
  private:
   SendableChooser<std::string> m_chooser;
   const std::string kAutoNameDefault = "Default";

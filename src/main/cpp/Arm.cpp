@@ -14,4 +14,3 @@ Arm::ArmAngles(float x, float y)
 }
 
 	
-}
