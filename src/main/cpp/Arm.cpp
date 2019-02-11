@@ -13,4 +13,15 @@ Arm::ArmAngles(float x, float y)
     float angle2 = ang2*180/M_PI;
 }
 
+void
+Arm::ArmMinMax(int min, int max)
+{
+
+float min_answer;
+min_answer = .38*((150-min)/.8)+10;
+float max_answer; 
+max_answer = (.45*((150-max)/.8)+110)-min_answer;
+
+}
+
 	

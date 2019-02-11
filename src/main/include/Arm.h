@@ -9,6 +9,7 @@ public:
 Arm(CANSparkMax *shoulderMotor, CANSparkMax *eblowMotor, WPI_TalonSRX *turretMotor, float armCamera);
 
 void ArmAngles(float x, float y);
+void ArmMinMax(int min, int max);
 
 
 }
