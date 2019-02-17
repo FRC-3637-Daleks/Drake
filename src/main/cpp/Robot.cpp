@@ -1,49 +1,9 @@
-#include "Robot.h"
-#include "Arm.h"
-#include "Claw.h"
+#include "Drake.h"
 #include <iostream>
-#include <Math.h>
 
-#include <frc/smartdashboard/SmartDashboard.h>
+// #thecoschallenge
 
-//double newvar = 90;
-//bool checkersIsfun = false;
-
-void Robot::RobotInit() {
-  leftDohickey       = new Joystick(LEFT_JOYSTICK);
-  rightDohickey      = new Joystick(RIGHT_JOYSTICK);
-  ps4                = new XboxController(XBOX_CONTROLLER);
-  //nerfSparkyItsOP    = new CANSparkMax(1, rev::CANSparkMax::MotorType::kBrushless);
-  //rawrXDTalon        = new WPI_TalonSRX(2);
-  //sparkEncoderboi    = new CANEncoder(*nerfSparkyItsOP);
-  //potInput           = new AnalogInput(THEBIGPOT);
-  //pot                = new AnalogPotentiometer(potInput, 360, 30);
-  arm                = new Arm(shoulderMotor, eblowMotor, turretMotor, turretPot, ARM_CAMERA);
-  claw               = new Claw(clawMotor, clawServo, ballLimit, CLAW_CAMERA);
-
-}
-  //forwardLimitSwitch = new CANDigitalInput(*nerfSparkyItsOP, CANDigitalInput::LimitSwitch::kForward, CANDigitalInput::LimitSwitchPolarity::kNormallyOpen);
-  //reverseLimitSwitch = new CANDigitalInput(*nerfSparkyItsOP, CANDigitalInput::LimitSwitch::kReverse, CANDigitalInput::LimitSwitchPolarity::kNormallyOpen);
-  
-
-void Robot::RobotPeriodic() {}
-
-void Robot::AutonomousInit() {}
-
-void Robot::AutonomousPeriodic() {}
-
-void Robot::TeleopInit() {}
-
-void Robot::TeleopPeriodic() {
-  // std::cout << nerfSparkyItsOP->GetFaults() << "\n";
-  //std::cout << sparkEncoderboi->GetVelocity() << "velocity\n";
-  //std::cout << sparkEncoderboi->GetPosition() << "position\n";
-
-  // std::cout << leftDohickey->GetY();
-
-  // #thecoschallenge
-
-  /*if (checkersIsfun) {
+  /* if (checkersIsfun) {
     if (!leftDohickey->GetButton(frc::Joystick::ButtonType::kTriggerButton)) {
        checkersIsfun = false;
      }
@@ -55,16 +15,74 @@ void Robot::TeleopPeriodic() {
       } else {
         newvar = (90);
       }
-    }
-  }
+    }*/
 
-  nerfSparkyItsOP->Set(.25 * newvar);
-  */
+void
+Robot::RobotInit() 
+{
+    m_drive      = new DalekDrive(1, 2, 3, 4, DalekDrive::driveType::kMecanum);
 
+    m_leftStick  = new frc::Joystick(1);
+    m_rightStick = new frc::Joystick(2);
+    m_xbox       = new frc::XboxController(3);
+
+    //Plus Sign Button Objects-> parameter xbox, angle
+    m_dPad[R]    = new frc::POVButton(*m_xbox, 0);
+    m_dPad[T]    = new frc::POVButton(*m_xbox, 90);
+    m_dPad[L]    = new frc::POVButton(*m_xbox, 180);
+    m_dPad[B]    = new frc::POVButton(*m_xbox, 270);
+
+    m_arm = new Arm(SHOULDER_MOTOR, ELBOW_MOTOR, TURRET_MOTOR, 0);
+    m_claw = new Claw(CLAW_MOTOR, 0);
+
+    //Grip to raspberry pi cam
+    //CameraServer::GetInstance()->StartAutomaticCapture();
 }
 
-void Robot::TestPeriodic() {}
+void
+Robot::RobotPeriodic() 
+{
+}
+
+void
+Robot::AutonomousInit() 
+{
+}
+
+void
+Robot::AutonomousPeriodic()
+{
+}
+
+void
+Robot::TeleopInit() 
+{
+}
+
+void
+Robot::TeleopPeriodic()
+{
+    //Setting to Cartesian Drive, one joystick
+    m_drive->Cartesian(*m_leftStick, 0.0);
+
+    // claw periodic function
+    m_claw->Tick(m_xbox);
+    m_arm->Tick(m_xbox, m_dPad);
+
+    //Motor Voltage values
+    m_arm->printVoltage();
+    m_claw->printVoltage();
+}
+
+void
+Robot::TestPeriodic()
+{
+}
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int
+main() 
+{ 
+  return frc::StartRobot<Robot>();
+}
 #endif

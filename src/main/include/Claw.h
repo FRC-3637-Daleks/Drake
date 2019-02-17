@@ -1,19 +1,33 @@
 #pragma once
-#include "Robot.h";
 
-#define servoOpen = 90; 
-#define servoClosed = 135;
+#include <iostream>
+#include <ctre/Phoenix.h>
+#include <frc/Servo.h>
+#include <frc/XboxController.h>
+
+
+#define servoOpen   90; 
+#define servoClosed 135;
+
+using namespace frc;
 
 class Claw {
-public:
+    public:
 
-Claw(WPI_TalonSRX *clawMotor, Servo *clawServo, AnalogInput *ballLimit, float clawCamera);
+        Claw(int clawTalon, int clawServo);
+        Claw(WPI_TalonSRX *clawTalon, Servo *clawServo);
 
-void OpenServo();
-void ClosedServo();
-void RetrieveBall();
-void EjectBall();
+        void Tick(XboxController *xbox);
+        void OpenServo();
+        void ClosedServo();
+        void RetrieveBall();
+        void EjectBall();
+        void printVoltage();
 
-}
+    private:
+        WPI_TalonSRX *m_clawMotor;
+        Servo *m_clawServo;
+};
+
 
 
