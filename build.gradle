@@ -1,7 +1,7 @@
 plugins {
     id "cpp"
     id "google-test-test-suite"
-    id "edu.wpi.first.GradleRIO" version "2019.1.1"
+    id "edu.wpi.first.GradleRIO" version "2019.2.1"
 }
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
@@ -50,14 +50,15 @@ model {
             if (includeDesktopSupport) {
                 targetPlatform wpi.platforms.desktop
             }
-
             sources.cpp {
                 source {
                     srcDir 'src/main/cpp'
-                    include '**/*.cpp', '**/*.cc'
+                    srcDir 'src/3rdParty/vl53l0x/src'
+                    include '**/*.cpp', '**/*.cc', '**/*.c'
                 }
                 exportedHeaders {
                     srcDir 'src/main/include'
+                    srcDir 'src/3rdParty/vl53l0x/include'
                     if (includeSrcInIncludeRoot) {
                         srcDir 'src/main/cpp'
                     }
