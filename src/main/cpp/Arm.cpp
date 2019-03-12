@@ -63,7 +63,9 @@ Arm::ArmInit()
     curX = startPositionX;
     curY = startPositionX;  
     moveToPosition(curX, curY);
-    //turretPosition = TURRET_NONE; 
+
+    startPosition = false;
+    startPositionReal = false;
 }
 
 void 
@@ -270,12 +272,6 @@ Arm::SetMotors()
     double elbowPosition;
     double shoulderPosition;
 
-    // Compute the position that the elbow and shoulder potentiometers should
-    // be at and tell the motorcontroller to go there via the PID closed loop.
-    // The talon can do this itself, for the shoulder motor controller we need
-    // to do the PID control loop in software.  Elbow has a fairly large error
-    // which varies over the range +/- 20 units.  Shoulder moves slowly to it's
-    // position, which may or may not be an issue.
     SmartDashboard::PutNumber("calcX", turretOffset - armBaseFrontX + lowArmLength * cos(shoulderAngle) + highArmLength * cos(shoulderAngle + elbowAngle - M_PI));
     SmartDashboard::PutNumber("calcY", armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI));
     float yHeight = armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI);
@@ -323,16 +319,10 @@ Arm::SetMotors()
     FindAngle(microLidar->GetMeasurement(2), microLidar->GetMeasurement(3));
 }
 
-// this function takes in the x distance from the target 
-// starting from the edge of the drive train, and the y
-// from the ground, and computes the required arm angles.
 bool
 Arm::FindArmAngles(float x, float y, float *ang1, float *ang2)
 {
     float r;
-
-    //TBD: must make the x value vary based on where the turret is.
-    // for now i assume it is facing forward
 
     //get y and x before r
 	y -= armBaseHeight;
@@ -422,5 +412,5 @@ void Arm::FindAngle(int frontSensor, int rearSensor){
         angle = int(M_PI / 2 - atan((rearSensor - frontSensor) / sensorFrontToBack));
     }
     SmartDashboard::PutNumber("Angle", angle);
-    // m_turretMotor->SetSelectedSensorPosition(angle);
+    m_turretMotor->SetSelectedSensorPosition(angle);
 }
