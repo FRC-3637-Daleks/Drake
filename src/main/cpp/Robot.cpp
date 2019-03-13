@@ -1,3 +1,14 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+
+// check comments in arm cpp lines 1&2
+// check comments in dalekdrive cpp line 280
+
 #include <iostream>
 #include "Drake.h"
 
@@ -15,31 +26,27 @@ Robot::RobotInit()
 
     m_arm = new Arm(SHOULDER_MOTOR, ELBOW_MOTOR, TURRET_MOTOR, 0);
     m_claw = new Claw(CLAW_MOTOR, 0);
+    CameraServer::GetInstance()->StartAutomaticCapture();
 
-#if USE_LIDAR
+#ifdef USE_LIDAR
     microLidar = new MicroLidar("/dev/i2c-2", MicroLidar::CONTINUOUS_MEASURE_MODE);
-    if (!microLidar) {
         for (int i = 0; i < LIDAR_COUNT; i++) {
             microLidar->Add(i);
         }
         microLidar->InitSensors();
         microLidar->StartMeasurements();
-    }
-    else {
-        std::cout << "Failed to initialize microLidars\n";
-    }
 #endif
     lineSensor = new LineSensor();
     dalekShuffleboard = new DalekShuffleboard(microLidar, lineSensor);
     ahrs = new AHRS(SPI::Port::kMXP);
     
-    // CameraServer::GetInstance()->StartAutomaticCapture();
+    //CameraServer::GetInstance()->StartAutomaticCapture();
 }
 
 void
 Robot::RobotPeriodic() 
 {
-#if USE_LIDAR
+#ifdef USE_LIDAR
     microLidar->PollDevices();
 #endif
     dalekShuffleboard->continious();
@@ -91,6 +98,7 @@ Robot::TeleopPeriodic()
     m_arm->printInfo();
     m_claw->printVoltage();
 
+    //Line Sensor is not a bool 
     /*bool line = lineSensor->getLineSensor(1);
         
         if(m_leftStick->GetTrigger()){

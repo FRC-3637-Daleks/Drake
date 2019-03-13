@@ -8,11 +8,11 @@
 #include <frc/smartdashboard/SendableChooser.h>
 #include "frc/smartdashboard/SmartDashBoard.h"
 
-#define servoOpen       90 
-#define servoClosed     135
-#define servoInverseClosed -45
-#define CONFIG_1
-#define CONFIG_2     //use one at a time 
+#define servoOpen          90
+#define servoClosed        125
+#define servoInverseClosed 30 // IT WORKS
+//#define CONFIG_1 //Can only use one at a time
+#define CONFIG_2
 
 using namespace frc;
 
@@ -25,10 +25,10 @@ class Claw {
         void Tick(XboxController *xbox);
         void OpenServo();
         void CloseServo();
+        void InverseCloseServo();
         void RetrieveBall();
         void EjectBall();
         void printVoltage();
-        void InverseCloseServo();
 
     private:
         WPI_TalonSRX *m_clawMotor;

@@ -12,19 +12,18 @@ Claw::Claw(WPI_TalonSRX *clawMotor, Servo *clawServo) {
 
 void Claw::Tick(XboxController *xbox) {
     #ifdef CONFIG_1
-    if (xbox->GetTriggerAxis(frc::GenericHID::JoystickHand::kLeftHand) > .1) {
-        OpenServo();
-    } else {
-        CloseServo();
-    }
+        if (xbox->GetTriggerAxis(frc::GenericHID::JoystickHand::kLeftHand) > .1) {
+            OpenServo();
+        } else {
+            CloseServo();
+        }
     #endif
     #ifdef CONFIG_2
-
-    if(xbox->GetTriggerAxis(frc::GenericHID::JoystickHand::kLeftHand)) {
-        CloseServo();
-    } else {
-        InverseCloseServo();
-    }
+        if (xbox->GetTriggerAxis(frc::GenericHID::JoystickHand::kLeftHand) > .1) {
+            CloseServo();
+        } else {
+            InverseCloseServo();
+        }
     #endif
     if (xbox->GetBumper(frc::GenericHID::JoystickHand::kLeftHand)) {
         RetrieveBall();
@@ -43,6 +42,11 @@ Claw::OpenServo() {
 void
 Claw::CloseServo() {
     m_clawServo->SetAngle(servoClosed);
+}
+
+void
+Claw::InverseCloseServo() {
+    m_clawServo->SetAngle(servoInverseClosed);
 }
 
 void

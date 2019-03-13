@@ -1,17 +1,9 @@
 #pragma once
 
 #define RED_BOT
-#define _USE_MATH_DEFINES
+#define BLACK_BOT
 
 #include <string>
-#include <iostream>
-#include <math.h>
-#include <frc/AnalogPotentiometer.h>
-#include <frc/buttons/POVButton.h>
-#include <frc/XboxController.h>
-#include <frc/Joystick.h>
-#include <frc/smartdashboard/SendableChooser.h>
-
 #include <frc/WPILib.h>
 #include <rev/CANSparkMax.h>
 #include <ctre/Phoenix.h>

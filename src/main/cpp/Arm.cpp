@@ -1,7 +1,4 @@
-// for now, both motors will move into position at the same time... 
-// however this might need to change in order to keep in bounds and 
-// not hit walls in front of us 
-#include "Arm.h"
+#include "Drake.h"
 
 Arm::Arm(int shoulderMotor, int elbowMotor, int turretMotor, int shoulderPot)
 {
@@ -55,45 +52,18 @@ Arm::ArmInit()
     m_turretMotor->ConfigFeedbackNotContinuous(true);
     m_turretMotor->ConfigAllowableClosedloopError(0, 0, 0);
 
-    //find the location soon and set it
-    //curX = 609.6; // This is temporary
-    //curY = 914.4; // 36 in
-
+    //curX = 609.6;
+    //curY = 609.6;
+    
     //Starting Position
     curX = startPositionX;
-    curY = startPositionX;  
+    curY = startPositionY;
     moveToPosition(curX, curY);
 
     startPosition = false;
     startPositionReal = false;
-}
-
-void 
-Arm::ThirtyInchLimit(double turretAngle){
-
-    double d1 = armBaseFrontX;
-    double d2 = armBaseSideX; 
-    double L1 = lowArmLength;
-    double L2 = highArmLength;
-    double x1;
-    
-    float x = d1 * 1/(cos(turretAngle));
-    float y = d2 * 1/(cos(M_PI - turretAngle));
-
-    if (x < y){
-
-        x1 = x;
-
-    } else {
-
-        x1 = y;
-    }
-
-    float xtotal = L1*cos(shoulderAngle) + L2*cos(elbowAngle + shoulderAngle - M_PI) + clawLength - x1; 
-    float ytotal = L1*sin(shoulderAngle) + L2*sin(elbowAngle + shoulderAngle - M_PI) - x1; 
-
-    std::cout << "X Position: " << xtotal << "Y Position: " << ytotal << "\n";
-
+    //turretPosition = TURRET_NONE;
+    // eventually replace this by somehow going to the starting position
 }
 
 float
@@ -272,6 +242,12 @@ Arm::SetMotors()
     double elbowPosition;
     double shoulderPosition;
 
+    // Compute the position that the elbow and shoulder potentiometers should
+    // be at and tell the motorcontroller to go there via the PID closed loop.
+    // The talon can do this itself, for the shoulder motor controller we need
+    // to do the PID control loop in software.  Elbow has a fairly large error
+    // which varies over the range +/- 20 units.  Shoulder moves slowly to it's
+    // position, which may or may not be an issue.
     SmartDashboard::PutNumber("calcX", turretOffset - armBaseFrontX + lowArmLength * cos(shoulderAngle) + highArmLength * cos(shoulderAngle + elbowAngle - M_PI));
     SmartDashboard::PutNumber("calcY", armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI));
     float yHeight = armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI);
@@ -319,10 +295,16 @@ Arm::SetMotors()
     FindAngle(microLidar->GetMeasurement(2), microLidar->GetMeasurement(3));
 }
 
+// this function takes in the x distance from the target 
+// starting from the edge of the drive train, and the y
+// from the ground, and computes the required arm angles.
 bool
 Arm::FindArmAngles(float x, float y, float *ang1, float *ang2)
 {
     float r;
+
+    //TBD: must make the x value vary based on where the turret is.
+    // for now i assume it is facing forward
 
     //get y and x before r
 	y -= armBaseHeight;
@@ -402,6 +384,7 @@ bool Arm::HardPID(WPI_TalonSRX *motor, float currentPosition, float finalPositio
     return false;
 }
 
+//Will find turret angles-> this is needed to 30 inch limit method
 void Arm::FindAngle(int frontSensor, int rearSensor){
     int angle;
 
@@ -411,6 +394,32 @@ void Arm::FindAngle(int frontSensor, int rearSensor){
     else if(rearSensor > frontSensor) {
         angle = int(M_PI / 2 - atan((rearSensor - frontSensor) / sensorFrontToBack));
     }
-    SmartDashboard::PutNumber("Angle", angle);
+    SmartDashboard::PutNumber("Angle", angle); 
     m_turretMotor->SetSelectedSensorPosition(angle);
+}
+void 
+Arm::ThirtyInchLimit(double turretAngle){
+
+    double d1 = armBaseFrontX;
+    double d2 = armBaseSideX; 
+    double L1 = lowArmLength;
+    double L2 = highArmLength;
+    double x1;
+    
+    float x = d1 * 1/(cos(turretAngle));
+    float y = d2 * 1/(cos(M_PI - turretAngle));
+
+    if (x < y){
+
+        x1 = x;
+
+    } else {
+
+        x1 = y;
+    }
+
+    float xtotal = L1*cos(shoulderAngle) + L2*cos(elbowAngle + shoulderAngle - M_PI) + clawLength - x1; 
+    float ytotal = L1*sin(shoulderAngle) + L2*sin(elbowAngle + shoulderAngle - M_PI) - x1; 
+
+    std::cout << "X Position: " << xtotal << "Y Position: " << ytotal << "\n";
 }
