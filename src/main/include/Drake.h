@@ -1,6 +1,6 @@
 #pragma once
 
-#define RED_BOT
+//#define RED_BOT
 #define BLACK_BOT
 
 #include <string>

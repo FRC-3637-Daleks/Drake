@@ -62,8 +62,7 @@ Arm::ArmInit()
 
     startPosition = false;
     startPositionReal = false;
-    //turretPosition = TURRET_NONE;
-    // eventually replace this by somehow going to the starting position
+    turretPosition = TURRET_NONE;
 }
 
 float
@@ -195,7 +194,8 @@ Arm::computeElbowPosition(double angle)
     return -173.267 * angle + 681.074;
     // Less old numbers: -155.796 * angle + 672.796
     // Old numbers: -169.284 * angle + 655.854
-#else
+#endif
+#ifdef BLACK_BOT
     // need BLACK_BOT numbers...for now if defi-ned using red
     return -169.284 * angle + 655.854;
 #endif
@@ -222,7 +222,8 @@ Arm::computeShoulderPosition(double angle)
 #ifdef RED_BOT
     return 0.166743 * angle + 0.251658;
     // Old numbers: angle * 0.0837496 + 0.393355
-#else // BLACK_BOT
+#endif
+#ifdef BLACK_BOT // BLACK_BOT
     return angle * 0.163044 + 0.142698;
 #endif
 }
@@ -252,7 +253,7 @@ Arm::SetMotors()
     SmartDashboard::PutNumber("calcY", armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI));
     float yHeight = armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI);
     if (startPosition) {
-        // TODO go straingt to else if we are at the center already
+        // TODO go straight to else if we are at the center already
         if (abs(m_turretMotor->GetSelectedSensorPosition(0) - TURRET_CENTER) > 20 && (yHeight < yClearance || (curY == yClearance + 125 && curX == 150 && abs(computeShoulderPosition(shoulderAngle) - m_shoulderPot->Get()) >= .001))) {
             curX = 150;
             curY = yClearance + 125;
@@ -292,7 +293,7 @@ Arm::SetMotors()
             }
         }
     }
-    FindAngle(microLidar->GetMeasurement(2), microLidar->GetMeasurement(3));
+    //FindAngle(microLidar->GetMeasurement(2), microLidar->GetMeasurement(3));
 }
 
 // this function takes in the x distance from the target 
@@ -384,9 +385,9 @@ bool Arm::HardPID(WPI_TalonSRX *motor, float currentPosition, float finalPositio
     return false;
 }
 
-//Will find turret angles-> this is needed to 30 inch limit method
 void Arm::FindAngle(int frontSensor, int rearSensor){
-    int angle;
+    #ifdef USE_LIDAR
+    float angle;
 
     if(frontSensor > rearSensor) {
         angle = int(M_PI / 2 + atan((frontSensor - rearSensor) / sensorFrontToBack));
@@ -395,10 +396,17 @@ void Arm::FindAngle(int frontSensor, int rearSensor){
         angle = int(M_PI / 2 - atan((rearSensor - frontSensor) / sensorFrontToBack));
     }
     SmartDashboard::PutNumber("Angle", angle); 
-    m_turretMotor->SetSelectedSensorPosition(angle);
+    m_turretMotor->SetSelectedSensorPosition(angle); 
+    #endif;
+    
 }
+
+//should work
 void 
-Arm::ThirtyInchLimit(double turretAngle){
+Arm::ThirtyInchLimit() {
+
+    float turretAngle = m_turretMotor->GetSelectedSensorPosition(0);
+    bool withinLimit;
 
     double d1 = armBaseFrontX;
     double d2 = armBaseSideX; 
@@ -411,15 +419,23 @@ Arm::ThirtyInchLimit(double turretAngle){
 
     if (x < y){
 
-        x1 = x;
-
+        x1 = x;    
     } else {
 
         x1 = y;
     }
 
+    
     float xtotal = L1*cos(shoulderAngle) + L2*cos(elbowAngle + shoulderAngle - M_PI) + clawLength - x1; 
     float ytotal = L1*sin(shoulderAngle) + L2*sin(elbowAngle + shoulderAngle - M_PI) - x1; 
 
-    std::cout << "X Position: " << xtotal << "Y Position: " << ytotal << "\n";
+    //30 inches -> 762 mm
+    if (xtotal < 762) {
+        withinLimit = true;
+     SmartDashboard::PutBoolean("30 inch limit", withinLimit);
+
+    }else {
+        withinLimit = false;
+    SmartDashboard::PutBoolean("30 inch limit", withinLimit);
+    }
 }

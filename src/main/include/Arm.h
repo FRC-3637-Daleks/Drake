@@ -19,7 +19,7 @@
 using namespace rev;
 using namespace std;
 
-// in millimeters (check these)
+// in millimeters
 #define armBaseHeight             342.9
 #define armBaseFrontX             387.35
 #define armBaseSideX              342.9
@@ -54,9 +54,17 @@ using namespace std;
 #define TURRET_NONE               0
 #define turretOffset              30.48
 
+#define TURRET_LEFT_BLACK            1001
+#define TURRET_RIGHT_BLACK           925
+#define TURRET_CENTER_BLACK             
+#define TURRET_NONE_BLACK               
+#define turretOffset_BLACK
+
 #define sensorFrontToBack         406.4
 #define SensorPivetPointX         234.95
 #define SensorPivetPointY         190.5
+#define USE_LIDAR
+
 enum POVButtons {R, T, L, B};
 
 using namespace frc;
@@ -85,7 +93,7 @@ class Arm {
 
     void SetMotors();
     void ArmInit();
-    void ThirtyInchLimit(double turretAngle);
+    void ThirtyInchLimit();
     bool validElbowPosition(double pos);
     double computeElbowPosition(double angle);
     bool validShoulderPosition(double pos);
