@@ -89,7 +89,7 @@ class Arm {
 
     void SetMotors(float overrideAllow);
     void ArmInit();
-    bool Within30InchLimit(float turretAngle, double shoulderAngle, double elbowAngle);
+    bool Within30InchLimit(float turretAngle);
     bool validElbowPosition(double pos);
     double computeElbowPosition(double angle);
     double computeElbowAngle();
