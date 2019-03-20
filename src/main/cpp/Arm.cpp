@@ -292,5 +292,5 @@ Arm::radiansToDegrees (float radians) {
     float degrees;
 
     degrees = 1.586 * (radians) * (180 / M_PI);
-    return degrees;
+    return degrees;//work?
 }
