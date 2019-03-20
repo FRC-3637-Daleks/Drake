@@ -57,6 +57,5 @@
     "tuple": "cpp",
     "typeinfo": "cpp",
     "utility": "cpp"
-  },
-  "C_Cpp.default.configurationProvider": "vscode-wpilib"
+  }
 }

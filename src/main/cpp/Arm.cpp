@@ -268,3 +268,29 @@ Arm::printInfo()
     SmartDashboard::PutNumber("Shoulder position", m_shoulderPot->Get());
     SmartDashboard::PutNumber("Shoulder close loop error", m_shoulderController->GetError());
 }
+
+//Is used for Lidar Sensors to make the turret perpendicular to a wall
+float
+Arm::ProximityDistance(int frontSensor, int rearSensor) {
+    float angle;
+    float degrees;
+
+    if (frontSensor > rearSensor) {
+        angle = M_PI / 2 + atan((frontSensor - rearSensor) / sensorFrontToBack);
+    }
+    else if (rearSensor > frontSensor) {
+        angle = M_PI / 2 - atan((rearSensor - frontSensor) / sensorFrontToBack);
+    }
+    degrees = radiansToDegrees (angle);
+    SmartDashboard::PutNumber("Angle", degrees); //Testing Only
+    return angle;
+}
+
+//Converts Radians to Degrees
+float
+Arm::radiansToDegrees (float radians) {
+    float degrees;
+
+    degrees = 1.586 * (radians) * (180 / M_PI);
+    return degrees;
+}

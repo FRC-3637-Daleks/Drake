@@ -42,6 +42,7 @@ using namespace std;
 #define ballPickUpY               165 //guess
 #define discLoadHeight            381//          10      not used for controls
 #define ballLoadHeight            0 //unknown    11      WRITE THIS ONE
+#define sensorFrontToBack         406.4
 
 enum POVButtons {R, T, L, B};
 
@@ -76,5 +77,7 @@ class Arm {
     bool FindArmAngles(float x, float y, float *ang1, float *ang2);
     // void FindArmMinMax(float base, float *elbowMin, float *elbowMax);
     float DeadZone(float input, float range);
+    float ProximityDistance(int frontSensor, int rearSensor);
+    float radiansToDegrees (float radians) ;
 };
 
