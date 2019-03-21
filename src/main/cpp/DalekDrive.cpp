@@ -216,8 +216,8 @@ DalekDrive::Cartesian(frc::Joystick* stick,	double gyroAngle)
 		double divisor;
 		x = stick->GetX(); x = squareInput(DeadZone(x, .1));
 		y = stick->GetY(); y = squareInput(DeadZone(y, .1));
-		divisor = -2 * abs(y) + 4;
-		z = stick->GetTwist(); z = squareInput(squareInput(DeadZone(z, .1))) / divisor;
+		twistAdjustment = -2 * abs(y) + 4; //Takes y (we think y is correct) changes twist divisor
+		z = stick->GetTwist(); z = squareInput(squareInput(DeadZone(z, .1))) / twistAdjustment;
 		if (stick->GetTriggerPressed()) {
 			x *= .3;
 			y *= .3;

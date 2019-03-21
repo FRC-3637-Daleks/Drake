@@ -475,3 +475,6 @@ Arm::radiansToDegrees (float radians) {
     degrees = 1.586 * (radians) * (180 / M_PI);
     return degrees;
 }
+
+float
+Arm::potentiometerToDegrees ()
