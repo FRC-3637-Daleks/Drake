@@ -213,29 +213,32 @@ DalekDrive::Cartesian(frc::Joystick* stick,	double gyroAngle)
 {
 	if(m_type == DalekDrive::driveType::kMecanum) {
 		double x, y, z;
+		double divisor;
 		x = stick->GetX(); x = squareInput(DeadZone(x, .1));
 		y = stick->GetY(); y = squareInput(DeadZone(y, .1));
-		z = stick->GetTwist(); z = squareInput(squareInput(DeadZone(z, .1))) / 5;
-		// if (stick->GetButton(Joystick::ButtonType::kTriggerButton)) {
-		// 	x /= 1000;
-		// 	y /= 1000;
-		// 	z /= 1000;
-		// 	cout << "SHOULD BE LOWERING\n";
-		// }
-		// float zMem = abs(z) + abs(x) + abs(y);
-		// if(z > 0) {
-		// 	z = zMem;
-		// } else {
-		// 	z = -zMem;
-		// }
+		divisor = -2 * abs(y) + 4;
+		z = stick->GetTwist(); z = squareInput(squareInput(DeadZone(z, .1))) / divisor;
+		if (stick->GetTriggerPressed()) {
+			x *= .3;
+			y *= .3;
+			z *= .3;
+		}
+		
+	// 	if (stick->GetButton(Joystick::ButtonType::kTriggerButton)) {
+	// 	float zMem = abs(z) + abs(x) + abs(y);
+	// 	if(z > 0) {
+	// 		z = zMem;
+	// 	} else {
+	// 		z = -zMem;
+	// 	}
 
-		// if(z<-1)
-		// 	z=-1;
-		// else if(z>1)
-		// 	z=1;
+	// 	if(z < -1)
+	// 		z = -1;
+	// 	else if(z > 1)
+	// 		z= 1;
 
-		m_mecanum->DriveCartesian(-x, y, -z, gyroAngle);
-	}
+	// 	m_mecanum->DriveCartesian(-x, y, -z, gyroAngle);
+	// }
 }
 
 void 

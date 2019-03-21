@@ -47,6 +47,7 @@ using namespace std;
 #define startPositionX            100   // able to change
 #define startPositionY            300   // able ro change
 #define yClearance                406
+#define sensorFrontToBack         406.4
 
 #ifdef RED_BOT
 #define TURRET_LEFT               998
@@ -100,5 +101,7 @@ class Arm {
     bool HardPID(CANSparkMax *motor, float currentPosition, float finalPosition, float fastThreshold, float slowThreshold);
     bool HardPID(WPI_TalonSRX *motor, float currentPosition, float finalPosition, float fastThreshold, float slowThreshold);
     float DeadZone(float input, float range);
+    float ProximityDistance(int frontSensor, int rearSensor);
+    float radiansToDegrees (float radians);
 };
 
