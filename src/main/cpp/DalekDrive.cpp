@@ -418,6 +418,8 @@ DalekDrive::RadiansToDegrees (double radians) {
     return degrees;
 }*/
 
+
+//Use SetLeftRightMotorOutputs(double leftOutput, double rightOutput) instead of using these single ones
 void
 DalekDrive::DriveBaseSquare(int leftSensor, int rightSensor) {
 	if (LidarInRange (leftSensor, rightSensor)) {
