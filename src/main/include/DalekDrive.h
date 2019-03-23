@@ -9,6 +9,7 @@
  * Utility class for handling Robot drive 
  */
 #pragma once
+// #define MOTOR_PRINT
 
 #define CAN_TIMEOUT 100
 #define STALL_LIMIT 60
