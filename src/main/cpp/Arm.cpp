@@ -272,8 +272,8 @@ bool
 Arm::Within30InchLimit(float turretAngle) {
     float xTry = abs(armBaseFrontX / cos(abs(turretAngle))),
           yTry = abs(armBaseSideX / cos(M_PI / 2 - abs(turretAngle))),
-	      x0 = lowArmLength * cos(shoulderAngle) + highArmLength
-            * cos(shoulderAngle + elbowAngle - M_PI) + clawLength;
+	      x0 = lowArmLength * cos(computeShoulderAngle()) + highArmLength
+            * cos(computeShoulderAngle() + computeElbowAngle() - M_PI) + clawLength;
 	if (xTry < yTry) {
         SmartDashboard::PutNumber("CALC_X", (x0 * cos(abs(turretAngle)) - armBaseFrontX + turretOffset) / 25.4);
 		return (x0 * cos(abs(turretAngle)) - armBaseFrontX + turretOffset) < 711;
