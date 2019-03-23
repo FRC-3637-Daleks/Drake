@@ -296,6 +296,12 @@ Arm::SetMotors(float overrideAllow)
     // position, which may or may not be an issue.
     
     //if we are out of bounds initially, comment out this whole loop then re-deploy
+    if(m_shoulderMotor->GetOutputCurrent() > 40.0 || m_elbowMotor->GetOutputCurrent() > 40.0 || m_turretMotor->GetOutputCurrent() > 40.0) {
+        m_shoulderMotor->Set(0.0);
+        m_elbowMotor->Set(0.0);
+        m_turretMotor->Set(0.0);
+   }
+   else {
     if (!overrideAllow && !init) {
         if (Within30InchLimit(computeTurretAngle())) {
             elbowAngleTestMem = computeElbowAngle();
@@ -352,6 +358,7 @@ Arm::SetMotors(float overrideAllow)
                 // m_turretMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, turretPosition);
             }
         }
+      }
     }
 }
 
