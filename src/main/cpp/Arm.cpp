@@ -449,60 +449,14 @@ Arm::printInfo()
     SmartDashboard::PutNumber("Shoulder Angle", computeShoulderAngle() * 180.0 / M_PI);
     SmartDashboard::PutNumber("Elbow Angle", computeElbowAngle() * 180.0 / M_PI);
    // SmartDashboard::PutNumber("Preset X", curX / 25.4);
-    //SmartDashboard::PutNumber("Preset Y", curY / 25.4);
+   // SmartDashboard::PutNumber("Preset Y", curY / 25.4);
    // SmartDashboard::PutNumber("Preset Shoulder", shoulderAngle * 180 / M_PI);
    // SmartDashboard::PutNumber("Preset Elbow", elbowAngle * 180 / M_PI);
-   // SmartDashboard::PutBoolean("Within 30\" range?", Within30InchLimit(computeTurretAngle()));
+    SmartDashboard::PutBoolean("Within 30\" range?", Within30InchLimit(computeTurretAngle(), computeShoulderAngle(), computeElbowAngle()));
 }
 
-//Is used for Lidar Sensors to make the turret perpendicular to a wall
-float
-Arm::ProximityDistance(int frontSensor, int rearSensor) {
-    float angle;
-    float degrees;
-
-    if (frontSensor > rearSensor) {
-        angle = M_PI / 2 + atan((frontSensor - rearSensor) / sensorFrontToBack);
-    }
-    else if (rearSensor > frontSensor) {
-        angle = M_PI / 2 - atan((rearSensor - frontSensor) / sensorFrontToBack);
-    }
-    degrees = radiansToDegrees (angle);
-    SmartDashboard::PutNumber("Angle", degrees); //Testing Only
-    return angle;
-}
-
-//Converts Radians to Degrees
-float
-Arm::radiansToDegrees (float radians) {
-    float degrees;
-
-    degrees = 1.586 * (radians) * (180 / M_PI);
-    return degrees;
-}
-
-//Is used for Lidar Sensors to make the turret perpendicular to a wall
-float
-Arm::ProximityDistance(int frontSensor, int rearSensor) {
-    float angle;
-    float degrees;
-
-    if (frontSensor > rearSensor) {
-        angle = M_PI / 2 + atan((frontSensor - rearSensor) / sensorFrontToBack);
-    }
-    else if (rearSensor > frontSensor) {
-        angle = M_PI / 2 - atan((rearSensor - frontSensor) / sensorFrontToBack);
-    }
-    degrees = radiansToDegrees (angle);
-    SmartDashboard::PutNumber("Angle", degrees); //Testing Only
-    return angle;
-}
-
-//Converts Radians to Degrees
-float
-Arm::radiansToDegrees (float radians) {
-    float degrees;
-
-    degrees = 1.586 * (radians) * (180 / M_PI);
-    return degrees;//work?
+double
+Arm::mmToInches (double mm) {
+    double inches = 25.4 * mm;
+    return inches;
 }

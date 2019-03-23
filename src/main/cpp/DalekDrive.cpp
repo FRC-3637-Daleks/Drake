@@ -391,3 +391,71 @@ DalekDrive::DriveOk()
 	}
 	return true;
 }
+
+//Is used for Lidar Sensors to make the turret perpendicular to a wall
+/*double
+DalekDrive::ProximityDistance(int frontSensor, int rearSensor) {
+    double angle;
+    double degrees;
+
+    if (frontSensor > rearSensor) {
+        angle = M_PI / 2 + atan((frontSensor - rearSensor) / sensorFrontToBack);
+    }
+    else if (rearSensor > frontSensor) {
+        angle = M_PI / 2 - atan((rearSensor - frontSensor) / sensorFrontToBack);
+    }
+    degrees = RadiansToDegrees (angle);
+    SmartDashboard::PutNumber("Angle", degrees); //Testing Only
+    return angle;
+}
+
+//Converts Radians to Degrees
+double
+DalekDrive::RadiansToDegrees (double radians) {
+    double degrees;
+
+    degrees = 1.586 * (radians) * (180 / M_PI);
+    return degrees;
+}*/
+
+void
+DalekDrive::DriveBaseSquare(int leftSensor, int rightSensor) {
+	if (LidarInRange (leftSensor, rightSensor)) {
+		if (rightSensor + 30 > leftSensor || rightSensor - 30 > leftSensor) {
+			//Turn left
+			m_leftMotor[FRONT]->Set(PositiveMotorSpeed);
+			m_leftMotor[REAR]->Set(PositiveMotorSpeed);
+			m_rightMotor[FRONT]->Set(NegativeMotorSpeed);
+			m_rightMotor[REAR]->Set(NegativeMotorSpeed);
+		}
+		else if (leftSensor + 30 > rightSensor || leftSensor - 30 > rightSensor) {
+			//Turn Right
+			m_rightMotor[FRONT]->Set(PositiveMotorSpeed);
+			m_rightMotor[REAR]->Set(PositiveMotorSpeed);
+			m_leftMotor[FRONT]->Set(NegativeMotorSpeed);
+			m_leftMotor[REAR]->Set(NegativeMotorSpeed);
+		}
+		else {
+			//STOP!
+			m_leftMotor[FRONT]->Set(NullMotorSpeed);
+			m_leftMotor[REAR]->Set(NullMotorSpeed);
+			m_rightMotor[FRONT]->Set(NullMotorSpeed);
+			m_rightMotor[REAR]->Set(NullMotorSpeed);
+		}
+		SmartDashboard::PutNumber("Left Motor Master", m_leftMotor[FRONT]->Get());
+		SmartDashboard::PutNumber("Left Motor Slave", m_leftMotor[REAR]->Get());
+		SmartDashboard::PutNumber("Left Motor Master", m_leftMotor[FRONT]->Get());
+		SmartDashboard::PutNumber("Left Motor Slave", m_leftMotor[REAR]->Get());
+	}
+}
+
+bool
+DalekDrive::LidarInRange (int sensorOne, int sensorTwo) {
+	if (sensorOne >= 1000 || sensorTwo >= 1000) {
+		SmartDashboard::PutBoolean("Lidar Status", 0);
+		return false;
+	}
+	//If less than 1000
+	SmartDashboard::PutBoolean("Lidar Status", 1);
+	return true;
+}

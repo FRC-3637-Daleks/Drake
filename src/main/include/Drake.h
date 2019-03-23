@@ -27,6 +27,8 @@
 
 class Robot : public frc::TimedRobot {
  public:
+  //bool firstRunPosition;
+
   void RobotInit() override;
   void RobotPeriodic() override;
   void AutonomousInit() override;
