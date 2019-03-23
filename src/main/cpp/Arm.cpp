@@ -115,7 +115,7 @@ Arm::Tick(XboxController *xbox, POVButton *dPad[])
             x = ballLoadX;
             y = ballLoadHeight; 
         } else if (dPad[R]->Get()) {
-            x = defaultX;
+            x = discLoadX;
             y = discLoadHeight;
         } else {
             x = ballPickUpX;
