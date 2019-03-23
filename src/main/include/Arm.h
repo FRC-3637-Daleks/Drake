@@ -40,12 +40,13 @@ using namespace std;
 #define ballPickUpX               279 
 #define rocketTopHeightX          150
 #define ballPickUpY               165 
-#define discLoadHeight            190
+#define discLoadHeight            230 // maybe change for black bot
 #define ballLoadHeight            1101
 #define ballLoadX                 368
+#define discLoadX                 165
 #define rocketTopHeightBallX      76
-#define startPositionX            100   // able to change
-#define startPositionY            300   // able ro change
+#define startPositionX            100
+#define startPositionY            300
 #define yClearance                406
 
 #ifdef RED_BOT
@@ -88,7 +89,7 @@ class Arm {
 
     void SetMotors(float overrideAllow);
     void ArmInit();
-    bool Within30InchLimit(float turretAngle, double shoulderAngle, double elbowAngle);
+    bool Within30InchLimit(float turretAngle);
     bool validElbowPosition(double pos);
     double computeElbowPosition(double angle);
     double computeElbowAngle();
