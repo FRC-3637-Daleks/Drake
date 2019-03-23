@@ -75,8 +75,8 @@ void
 Robot::TeleopPeriodic()
 {
     bool calibrated = !(ahrs->IsCalibrating());
-    SmartDashboard::PutBoolean("NAV-X calibrated", calibrated);
-    SmartDashboard::PutBoolean("Dpad[L]", m_dPad[L]->Get());
+  //  SmartDashboard::PutBoolean("NAV-X calibrated", calibrated);
+   // SmartDashboard::PutBoolean("Dpad[L]", m_dPad[L]->Get());
 
     // pick one to test, all should in principle work for the mecanum wheels
     // m_drive->TankDrive(m_leftStick, m_rightStick, false);
@@ -84,7 +84,7 @@ Robot::TeleopPeriodic()
     // m_drive->Cartesian(m_leftStick, m_rightStick, 0.0);
     // m_drive->SetLeftRightMotorOutputs(m_leftStick->GetY(), -m_rightStick->GetY());
     if(calibrated) {
-        SmartDashboard::PutNumber("Robot Heading", ahrs->GetFusedHeading());
+    //    SmartDashboard::PutNumber("Robot Heading", ahrs->GetFusedHeading());
         m_drive->Cartesian(m_leftStick, 0.0);
         m_claw->Tick(m_xbox);
         m_arm->Tick(m_xbox, m_dPad);
