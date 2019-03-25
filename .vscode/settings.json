@@ -60,5 +60,6 @@
       "complex": "cpp"
     },
     "C_Cpp.default.configurationProvider": "vscode-wpilib",
-    "C_Cpp.dimInactiveRegions": false
+    "C_Cpp.dimInactiveRegions": false,
+    "C_Cpp.errorSquiggles": "Disabled"
   }

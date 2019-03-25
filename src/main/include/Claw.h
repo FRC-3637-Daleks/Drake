@@ -11,7 +11,7 @@
 #define servoOpen          90
 #define servoClosed        125
 #define servoInverseClosed 30 // IT WORKS
-//#define CONFIG_1 //Can only use one at a time
+// #define CONFIG_1
 #define CONFIG_2
 
 using namespace frc;
