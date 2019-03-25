@@ -7,7 +7,7 @@
 
 #define CALIBRATION_DISTANCE_MM 200
 
-#define LIDAR_COUNT 6
+#define LIDAR_COUNT 2
 
 /*
  * Example

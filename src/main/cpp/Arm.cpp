@@ -293,7 +293,7 @@ Arm::Within30InchLimit(float turretAngle) {
 	}
 }
 //Took this out of setMotors
-//Could had been a reason by 30 inch limit was acting up
+//Could have caused 30 inch limit to act up
 void
 Arm::maxOutMotor()
 { 
@@ -375,7 +375,7 @@ Arm::SetMotors(float overrideAllow)
             }
         }
       }
-}
+    }
 // this function takes in the x distance from the target 
 // starting from the edge of the drive train, and the y
 // from the ground, and computes the required arm angles.
@@ -393,8 +393,7 @@ Arm::FindArmAngles(float x, float y, float *ang1, float *ang2)
     return (*ang1 > 0 && *ang2 > 0);
 }
 
-bool 
-Arm::HardPID(CANSparkMax *motor, float currentPosition, float finalPosition, float fastThreshold, float slowThreshold) {
+bool Arm::HardPID(CANSparkMax *motor, float currentPosition, float finalPosition, float fastThreshold, float slowThreshold) {
     if (abs(currentPosition - finalPosition) > fastThreshold) {
         if (currentPosition > finalPosition) {
             motor->Set(-1);
@@ -473,7 +472,7 @@ Arm::printInfo()
 
 double
 Arm::mmToInches (double mm) {
-    double inches = 25.4 * mm;
+    double inches = mm / 25.4;
     return inches;
 }
 

@@ -16,7 +16,6 @@
 void
 Robot::RobotInit() 
 {   
-
     m_drive      = new DalekDrive(1, 2, 3, 4, DalekDrive::driveType::kMecanum);
     m_leftStick  = new frc::Joystick(1);
     //m_rightStick = new frc::Joystick(2);
@@ -28,7 +27,6 @@ Robot::RobotInit()
 
     m_arm = new Arm(SHOULDER_MOTOR, ELBOW_MOTOR, TURRET_MOTOR, 0);
     m_claw = new Claw(CLAW_MOTOR, 0);
-  
     // CameraServer::GetInstance()->StartAutomaticCapture();
 
 #ifdef USE_LIDAR
@@ -78,6 +76,8 @@ Robot::TeleopInit()
 void
 Robot::TeleopPeriodic()
 {
+    SmartDashboard::PutBoolean("Dpad[L]", m_dPad[L]->Get());
+
     bool calibrated = !(ahrs->IsCalibrating());
   //  SmartDashboard::PutBoolean("NAV-X calibrated", calibrated);
    // SmartDashboard::PutBoolean("Dpad[L]", m_dPad[L]->Get());
@@ -89,7 +89,12 @@ Robot::TeleopPeriodic()
     // m_drive->SetLeftRightMotorOutputs(m_leftStick->GetY(), -m_rightStick->GetY());
     if(calibrated) {
     //    SmartDashboard::PutNumber("Robot Heading", ahrs->GetFusedHeading());
-        m_drive->Cartesian(m_leftStick, 0.0);
+        // if (m_leftStick->GetRawButton(2)) {
+		//     m_drive->DriveBaseSquare(microLidar->GetMeasurement(0), microLidar->GetMeasurement(1));
+	    // }
+        // else {
+            m_drive->Cartesian(m_leftStick, 0.0);
+        //}
         m_claw->Tick(m_xbox);
         m_arm->Tick(m_xbox, m_dPad);
     }    
