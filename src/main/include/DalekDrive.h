@@ -24,6 +24,7 @@
 #define PositiveMotorSpeed 		  .2
 #define NegativeMotorSpeed		  -.2
 #define NullMotorSpeed			  0
+#define LidarError				  30
 
 class DalekDrive {
   public:

@@ -423,26 +423,17 @@ DalekDrive::RadiansToDegrees (double radians) {
 void
 DalekDrive::DriveBaseSquare(int leftSensor, int rightSensor) {
 	if (LidarInRange (leftSensor, rightSensor)) {
-		if (rightSensor + 30 > leftSensor || rightSensor - 30 > leftSensor) {
+		if (rightSensor + LidarError > leftSensor || rightSensor - LidarError > leftSensor) {
 			//Turn left
-			m_leftMotor[FRONT]->Set(PositiveMotorSpeed);
-			m_leftMotor[REAR]->Set(PositiveMotorSpeed);
-			m_rightMotor[FRONT]->Set(NegativeMotorSpeed);
-			m_rightMotor[REAR]->Set(NegativeMotorSpeed);
+			SetLeftRightMotorOutputs(PositiveMotorSpeed, NegativeMotorSpeed);
 		}
-		else if (leftSensor + 30 > rightSensor || leftSensor - 30 > rightSensor) {
+		else if (leftSensor + LidarError > rightSensor || leftSensor - LidarError > rightSensor) {
 			//Turn Right
-			m_rightMotor[FRONT]->Set(PositiveMotorSpeed);
-			m_rightMotor[REAR]->Set(PositiveMotorSpeed);
-			m_leftMotor[FRONT]->Set(NegativeMotorSpeed);
-			m_leftMotor[REAR]->Set(NegativeMotorSpeed);
+			SetLeftRightMotorOutputs(NegativeMotorSpeed, PositiveMotorSpeed);
 		}
 		else {
 			//STOP!
-			m_leftMotor[FRONT]->Set(NullMotorSpeed);
-			m_leftMotor[REAR]->Set(NullMotorSpeed);
-			m_rightMotor[FRONT]->Set(NullMotorSpeed);
-			m_rightMotor[REAR]->Set(NullMotorSpeed);
+			SetLeftRightMotorOutputs(NullMotorSpeed, NullMotorSpeed);
 		}
 		SmartDashboard::PutNumber("Left Motor Master", m_leftMotor[FRONT]->Get());
 		SmartDashboard::PutNumber("Left Motor Slave", m_leftMotor[REAR]->Get());
