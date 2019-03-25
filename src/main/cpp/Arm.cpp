@@ -302,7 +302,7 @@ Arm::maxOutMotor()
         m_elbowMotor->Set(0.0);
         m_turretMotor->Set(0.0);
     } else {
-
+        SetMotors();
     }
 }
 
@@ -317,65 +317,70 @@ Arm::SetMotors(float overrideAllow)
     // to do the PID control loop in software.  Elbow has a fairly large error
     // which varies over the range +/- 20 units. Shoulder moves slowly to it's
     // position, which may or may not be an issue.
-    
-    if (!overrideAllow && !init) {
-        if (Within30InchLimit(computeTurretAngle())) {
-            elbowAngleTestMem = computeElbowAngle();
-            shoulderAngleTestMem = computeShoulderAngle();
-        } else {
-            shoulderAngle = shoulderAngleTestMem;
-            elbowAngle = elbowAngleTestMem;
-        }
-    }
-    float yHeight = armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI);
-    if (startPosition) {
-        // if we cannot move to start position safely
-        if (abs(m_turretMotor->GetSelectedSensorPosition(0) - TURRET_CENTER) > 35 && (yHeight < yClearance || (curY == yClearance + 125 && curX == 150 && abs(computeShoulderPosition(shoulderAngle) - m_shoulderPot->Get()) >= .001))) {
-            curX = 150;
-            curY = yClearance + 125;
-            moveToPosition(curX, curY);
-            m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, computeElbowPosition(elbowAngle));
-            HardPID(m_shoulderMotor, m_shoulderPot->Get(), computeShoulderPosition(shoulderAngle), .01, .001);
-        } else {
-            if (HardPID(m_turretMotor, m_turretMotor->GetSelectedSensorPosition(0), TURRET_CENTER, 20, 5)) {
-                startPosition = false;
-                startPositionReal = true;
-                curX = startPositionX;
-                curY = startPositionY;
-                moveToPosition(curX, curY);
-            }
-        }
+     if(m_shoulderMotor->GetOutputCurrent() > 40.0 || m_elbowMotor->GetOutputCurrent() > 40.0 || m_turretMotor->GetOutputCurrent() > 40.0) {
+        m_shoulderMotor->Set(0.0);
+        m_elbowMotor->Set(0.0);
+        m_turretMotor->Set(0.0);
     } else {
-        if (startPositionReal) {
-            if (HardPID(m_shoulderMotor, m_shoulderPot->Get(), computeShoulderPosition(shoulderAngle), .005, .001)) {
+        if (!overrideAllow && !init) {
+            if (Within30InchLimit(computeTurretAngle())) {
+                elbowAngleTestMem = computeElbowAngle();
+                shoulderAngleTestMem = computeShoulderAngle();
+            } else {
+                shoulderAngle = shoulderAngleTestMem;
+                elbowAngle = elbowAngleTestMem;
+            }
+        }
+        float yHeight = armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI);
+        if (startPosition) {
+            // if we cannot move to start position safely
+            if (abs(m_turretMotor->GetSelectedSensorPosition(0) - TURRET_CENTER) > 35 && (yHeight < yClearance || (curY == yClearance + 125 && curX == 150 && abs(computeShoulderPosition(shoulderAngle) - m_shoulderPot->Get()) >= .001))) {
+                curX = 150;
+                curY = yClearance + 125;
+                moveToPosition(curX, curY);
                 m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, computeElbowPosition(elbowAngle));
-                startPositionReal = false;
+                HardPID(m_shoulderMotor, m_shoulderPot->Get(), computeShoulderPosition(shoulderAngle), .01, .001);
+            } else {
+                if (HardPID(m_turretMotor, m_turretMotor->GetSelectedSensorPosition(0), TURRET_CENTER, 20, 5)) {
+                    startPosition = false;
+                    startPositionReal = true;
+                    curX = startPositionX;
+                    curY = startPositionY;
+                    moveToPosition(curX, curY);
+                }
             }
         } else {
-            elbowPosition = computeElbowPosition(elbowAngle);
-            shoulderPosition = computeShoulderPosition(shoulderAngle);
-            if (shoulderOverride && !init) {
-                if (HardPID(m_shoulderMotor, m_shoulderPot->Get(), computeShoulderPosition(SAFE_SHOULDER_ANGLE), .005, .001)) {
-                    m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, elbowPosition);
-                    shoulderOverride = false;
+            if (startPositionReal) {
+                if (HardPID(m_shoulderMotor, m_shoulderPot->Get(), computeShoulderPosition(shoulderAngle), .005, .001)) {
+                    m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, computeElbowPosition(elbowAngle));
+                    startPositionReal = false;
                 }
             } else {
-                if(validElbowPosition(elbowPosition)) {
-                    m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, elbowPosition);
+                elbowPosition = computeElbowPosition(elbowAngle);
+                shoulderPosition = computeShoulderPosition(shoulderAngle);
+                if (shoulderOverride && !init) {
+                    if (HardPID(m_shoulderMotor, m_shoulderPot->Get(), computeShoulderPosition(SAFE_SHOULDER_ANGLE), .005, .001)) {
+                        m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, elbowPosition);
+                        shoulderOverride = false;
+                    }
+                } else {
+                    if(validElbowPosition(elbowPosition)) {
+                        m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, elbowPosition);
+                    }
+                    if(validShoulderPosition(shoulderPosition)) {
+                        HardPID(m_shoulderMotor, m_shoulderPot->Get(), shoulderPosition, .005, .001);
+                        // m_shoulderController->SetSetpoint(shoulderPosition);
+                        // m_shoulderController->SetEnabled(true);
+                    }
                 }
-                if(validShoulderPosition(shoulderPosition)) {
-                    HardPID(m_shoulderMotor, m_shoulderPot->Get(), shoulderPosition, .005, .001);
-                    // m_shoulderController->SetSetpoint(shoulderPosition);
-                    // m_shoulderController->SetEnabled(true);
+                if (turretPosition != TURRET_NONE) {
+                    HardPID(m_turretMotor, m_turretMotor->GetSelectedSensorPosition(0), turretPosition, 20, 5);
+                    // m_turretMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, turretPosition);
                 }
-            }
-            if (turretPosition != TURRET_NONE) {
-                HardPID(m_turretMotor, m_turretMotor->GetSelectedSensorPosition(0), turretPosition, 20, 5);
-                // m_turretMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, turretPosition);
             }
         }
-      }
-    }
+        }
+}
 // this function takes in the x distance from the target 
 // starting from the edge of the drive train, and the y
 // from the ground, and computes the required arm angles.
