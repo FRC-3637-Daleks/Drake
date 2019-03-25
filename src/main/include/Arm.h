@@ -102,5 +102,7 @@ class Arm {
     bool HardPID(WPI_TalonSRX *motor, float currentPosition, float finalPosition, float fastThreshold, float slowThreshold);
     float DeadZone(float input, float range);
     double mmToInches(double mm);
+    double radsToDegrees (double rads);
+    float ProximityDistance(int frontSensor, int rearSensor);
+    void maxOutMotor();
 };
-

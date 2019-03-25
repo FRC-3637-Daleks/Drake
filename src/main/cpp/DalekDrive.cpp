@@ -392,33 +392,6 @@ DalekDrive::DriveOk()
 	return true;
 }
 
-//Is used for Lidar Sensors to make the turret perpendicular to a wall
-/*double
-DalekDrive::ProximityDistance(int frontSensor, int rearSensor) {
-    double angle;
-    double degrees;
-
-    if (frontSensor > rearSensor) {
-        angle = M_PI / 2 + atan((frontSensor - rearSensor) / sensorFrontToBack);
-    }
-    else if (rearSensor > frontSensor) {
-        angle = M_PI / 2 - atan((rearSensor - frontSensor) / sensorFrontToBack);
-    }
-    degrees = RadiansToDegrees (angle);
-    SmartDashboard::PutNumber("Angle", degrees); //Testing Only
-    return angle;
-}
-
-//Converts Radians to Degrees
-double
-DalekDrive::RadiansToDegrees (double radians) {
-    double degrees;
-
-    degrees = 1.586 * (radians) * (180 / M_PI);
-    return degrees;
-}*/
-
-
 //Use SetLeftRightMotorOutputs(double leftOutput, double rightOutput) instead of using these single ones
 void
 DalekDrive::DriveBaseSquare(int leftSensor, int rightSensor) {

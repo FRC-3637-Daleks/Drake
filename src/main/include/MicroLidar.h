@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "VL53L0X.h"
@@ -65,4 +64,3 @@ private:
     VL53L0X *Devices[MAX_MICROLIDAR_DEVICE_COUNT];
     frc::DigitalOutput *DigGpio[MAX_MICROLIDAR_DEVICE_COUNT];
 };
-

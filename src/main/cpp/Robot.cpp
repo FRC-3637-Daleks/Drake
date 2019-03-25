@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include "Drake.h"
+#include <mutex>
 
 void
 Robot::RobotInit() 
@@ -40,8 +41,9 @@ Robot::RobotInit()
     dalekShuffleboard = new DalekShuffleboard(microLidar, lineSensor);
     ahrs = new AHRS(SPI::Port::kMXP);
     
-    CameraServer::GetInstance()->StartAutomaticCapture();
+    //CameraServer::GetInstance()->StartAutomaticCapture();
 }
+
 
 void
 Robot::RobotPeriodic() 

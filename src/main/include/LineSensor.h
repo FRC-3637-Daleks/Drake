@@ -18,4 +18,3 @@ public:
 private:
     DigitalInput *digitalInputArray[LINE_SENSOR_COUNT];
 };
-

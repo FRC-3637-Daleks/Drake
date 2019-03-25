@@ -261,11 +261,21 @@ Arm::computeShoulderPosition(double angle)
 #endif
 }
 
+//need to find the range
 bool
 Arm::validShoulderPosition(double pos)
 {
-    // need to figure out valid values for red and black bots
+#ifdef RED_BOT
+    if((pos < 100.0) || (pos > 700.0)) { 
+        return false;
+    }
     return true;
+#else
+    if((pos < 100.0) || (pos > 700.0)) {
+        return false;
+    }
+    return true;
+#endif
 }
 
 bool
@@ -282,6 +292,19 @@ Arm::Within30InchLimit(float turretAngle) {
 		return (x0 * cos(M_PI / 2 - abs(turretAngle)) - armBaseSideX + turretOffset) < 711;
 	}
 }
+//Took this out of setMotors
+//Could have caused 30 inch limit to act up
+void
+Arm::maxOutMotor()
+{ 
+    if(m_shoulderMotor->GetOutputCurrent() > 40.0 || m_elbowMotor->GetOutputCurrent() > 40.0 || m_turretMotor->GetOutputCurrent() > 40.0) {
+        m_shoulderMotor->Set(0.0);
+        m_elbowMotor->Set(0.0);
+        m_turretMotor->Set(0.0);
+    } else {
+
+    }
+}
 
 void
 Arm::SetMotors(float overrideAllow)
@@ -295,13 +318,6 @@ Arm::SetMotors(float overrideAllow)
     // which varies over the range +/- 20 units. Shoulder moves slowly to it's
     // position, which may or may not be an issue.
     
-    //if we are out of bounds initially, comment out this whole loop then re-deploy
-    if(m_shoulderMotor->GetOutputCurrent() > 40.0 || m_elbowMotor->GetOutputCurrent() > 40.0 || m_turretMotor->GetOutputCurrent() > 40.0) {
-        m_shoulderMotor->Set(0.0);
-        m_elbowMotor->Set(0.0);
-        m_turretMotor->Set(0.0);
-   }
-   else {
     if (!overrideAllow && !init) {
         if (Within30InchLimit(computeTurretAngle())) {
             elbowAngleTestMem = computeElbowAngle();
@@ -360,7 +376,6 @@ Arm::SetMotors(float overrideAllow)
         }
       }
     }
-}
 // this function takes in the x distance from the target 
 // starting from the edge of the drive train, and the y
 // from the ground, and computes the required arm angles.
@@ -444,19 +459,42 @@ Arm::printInfo()
    // SmartDashboard::PutNumber("Shoulder Error", abs(computeShoulderPosition(shoulderAngle) - m_shoulderPot->Get()));
    // SmartDashboard::PutNumber("Turret Error", abs(m_turretMotor->GetSelectedSensorPosition(0) - turretPosition));
 
-    SmartDashboard::PutNumber("Turret Angle", computeTurretAngle() * 180.0 / M_PI);
-    SmartDashboard::PutNumber("Shoulder Angle", computeShoulderAngle() * 180.0 / M_PI);
-    SmartDashboard::PutNumber("Elbow Angle", computeElbowAngle() * 180.0 / M_PI);
-    SmartDashboard::PutNumber("Preset X", curX / 25.4);
-    SmartDashboard::PutNumber("Preset Y", curY / 25.4);
-    SmartDashboard::PutNumber("Preset Shoulder", shoulderAngle * 180 / M_PI);
-    SmartDashboard::PutNumber("Preset Elbow", elbowAngle * 180 / M_PI);
+    SmartDashboard::PutNumber("Turret Angle", radsToDegrees(computeTurretAngle()));
+    SmartDashboard::PutNumber("Shoulder Angle", radsToDegrees(computeShoulderAngle()));
+    SmartDashboard::PutNumber("Elbow Angle", radsToDegrees(computeElbowAngle()));
+    SmartDashboard::PutNumber("Preset X", mmToInches(curX));
+    SmartDashboard::PutNumber("Preset Y", mmToInches(curY));
+    SmartDashboard::PutNumber("Preset Shoulder", radsToDegrees(shoulderAngle));
+    SmartDashboard::PutNumber("Preset Elbow", radsToDegrees(elbowAngle));
 
     SmartDashboard::PutBoolean("Within 30\" range?", Within30InchLimit(computeTurretAngle()));
 }
 
 double
 Arm::mmToInches (double mm) {
-    double inches = 25.4 * mm;
+    double inches = mm / 25.4;
     return inches;
+}
+
+double
+Arm::radsToDegrees (double rads) {
+    double degrees = rads * (180/M_PI);
+    return degrees;
+}
+
+//Is used for Lidar Sensors to make the turret perpendicular to a wall
+float
+Arm::ProximityDistance(int frontSensor, int rearSensor) {
+    float angle;
+    float degrees;
+
+    if (frontSensor > rearSensor) {
+        angle = M_PI / 2 + atan((frontSensor - rearSensor) / sensorFrontToBack);
+    }
+    else if (rearSensor > frontSensor) {
+        angle = M_PI / 2 - atan((rearSensor - frontSensor) / sensorFrontToBack);
+    }
+    degrees = radsToDegrees (angle);
+    //SmartDashboard::PutNumber("Angle", degrees); //Testing Only
+    return angle;
 }

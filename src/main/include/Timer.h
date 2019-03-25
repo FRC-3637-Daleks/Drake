@@ -1,12 +1,3 @@
-/*
- * Timer.h
- * 
- * Helpful timer routines
- * 
- *   Created on: Jan 27, 2019
- *   Author    : dlawrence
- */
-
 #pragma once
 
 #include <frc/Timer.h>
