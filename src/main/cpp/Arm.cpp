@@ -45,7 +45,7 @@ Arm::ArmInit()
 
     // shoulder motor PID control
     //m_shoulderController->SetPID(7.0, 0.0, 0.0);
-    //m_shoulderController->SetContinuous(false);
+    m_shoulderController->SetContinuous(false);
     //m_shoulderController->Reset();
 
  	m_shoulderMotor->SetIdleMode(CANSparkMax::IdleMode::kBrake);
@@ -223,7 +223,7 @@ double Arm::computeTurretAngle() {
 #ifdef RED_BOT
     return -0.00576312 * m_turretMotor->GetSelectedSensorPosition(0) + 4.1677;
 #else
-    return -0.0413272 * m_turretMotor->GetSelectedSensorPosition(0) + 39.8119;
+    return -0.0391625 * m_turretMotor->GetSelectedSensorPosition(0) + 37.6482;
 #endif
 }
 
@@ -261,22 +261,6 @@ Arm::computeShoulderPosition(double angle)
 #endif
 }
 
-//need to find the range
-bool
-Arm::validShoulderPosition(double pos)
-{
-#ifdef RED_BOT
-    if((pos < 100.0) || (pos > 700.0)) { 
-        return false;
-    }
-    return true;
-#else
-    if((pos < 100.0) || (pos > 700.0)) {
-        return false;
-    }
-    return true;
-#endif
-}
 
 bool
 Arm::Within30InchLimit(float turretAngle) {
@@ -297,13 +281,7 @@ Arm::Within30InchLimit(float turretAngle) {
 void
 Arm::maxOutMotor()
 { 
-    if(m_shoulderMotor->GetOutputCurrent() > 40.0 || m_elbowMotor->GetOutputCurrent() > 40.0 || m_turretMotor->GetOutputCurrent() > 40.0) {
-        m_shoulderMotor->Set(0.0);
-        m_elbowMotor->Set(0.0);
-        m_turretMotor->Set(0.0);
-    } else {
-
-    }
+    
 }
 
 void
@@ -317,7 +295,14 @@ Arm::SetMotors(float overrideAllow)
     // to do the PID control loop in software.  Elbow has a fairly large error
     // which varies over the range +/- 20 units. Shoulder moves slowly to it's
     // position, which may or may not be an issue.
-    
+
+    if(m_shoulderMotor->GetOutputCurrent() > 40.0 || m_elbowMotor->GetOutputCurrent() > 40.0 || m_turretMotor->GetOutputCurrent() > 40.0) {
+        m_shoulderMotor->Set(0.0);
+        m_elbowMotor->Set(0.0);
+        m_turretMotor->Set(0.0);
+        SmartDashboard::PutBoolean("Voltage Wackometer (True is not wack)", false);
+    } else {
+    SmartDashboard::PutBoolean("Voltage Wackometer (True is not wack)", true);
     if (!overrideAllow && !init) {
         if (Within30InchLimit(computeTurretAngle())) {
             elbowAngleTestMem = computeElbowAngle();
@@ -363,11 +348,9 @@ Arm::SetMotors(float overrideAllow)
                 if(validElbowPosition(elbowPosition)) {
                     m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, elbowPosition);
                 }
-                if(validShoulderPosition(shoulderPosition)) {
-                    HardPID(m_shoulderMotor, m_shoulderPot->Get(), shoulderPosition, .005, .001);
-                    // m_shoulderController->SetSetpoint(shoulderPosition);
-                    // m_shoulderController->SetEnabled(true);
-                }
+                 HardPID(m_shoulderMotor, m_shoulderPot->Get(), shoulderPosition, .005, .001);
+                // m_shoulderController->SetSetpoint(shoulderPosition);
+                // m_shoulderController->SetEnabled(true);
             }
             if (turretPosition != TURRET_NONE) {
                 HardPID(m_turretMotor, m_turretMotor->GetSelectedSensorPosition(0), turretPosition, 20, 5);
@@ -376,6 +359,7 @@ Arm::SetMotors(float overrideAllow)
         }
       }
     }
+}
 // this function takes in the x distance from the target 
 // starting from the edge of the drive train, and the y
 // from the ground, and computes the required arm angles.
@@ -416,8 +400,15 @@ bool Arm::HardPID(CANSparkMax *motor, float currentPosition, float finalPosition
 }
 
 // black one is wackadoo... i think the potentiometer is messed up because its range is much smaller
+
 bool
 Arm::HardPID(WPI_TalonSRX *motor, float currentPosition, float finalPosition, float fastThreshold, float slowThreshold) {
+    // yes this should really be done better for the black bot, but whatever
+    #ifndef RED_BOT
+    fastThreshold = 5;
+    slowThreshold = 3;
+    #endif
+    SmartDashboard::PutNumber("Turret Error", abs(currentPosition - finalPosition));
     if (abs(currentPosition - finalPosition) > fastThreshold) {
         if (currentPosition > finalPosition) {
             motor->Set(.8);
@@ -426,11 +417,19 @@ Arm::HardPID(WPI_TalonSRX *motor, float currentPosition, float finalPosition, fl
         }
     } else {
         if (abs(currentPosition - finalPosition) > slowThreshold) {
+            #ifdef RED_BOT
             if (currentPosition > finalPosition) {
                 motor->Set(.2);
             } else {
                 motor->Set(-.2);
             }
+            #else
+            if (currentPosition > finalPosition) {
+                motor->Set(.4);
+            } else {
+                motor->Set(-.4);
+            }
+            #endif
         } else {
             motor->Set(0);
             return true;

@@ -1,7 +1,7 @@
 plugins {
     id "cpp"
     id "google-test-test-suite"
-    id "edu.wpi.first.GradleRIO" version "2019.2.1" // 4 is for black bot, 2 is for red bot
+    id "edu.wpi.first.GradleRIO" version "2019.4.1" // 4 is for black bot, 2 is for red bot
 }
 
 // Define my targets (RoboRIO) and artifacts (deployable files)

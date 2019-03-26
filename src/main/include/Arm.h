@@ -54,9 +54,9 @@ using namespace std;
 #define TURRET_RIGHT              453
 #define TURRET_CENTER             718.5
 #else
-#define TURRET_LEFT               1001
-#define TURRET_RIGHT              925
-#define TURRET_CENTER             964 
+#define TURRET_LEFT               998
+#define TURRET_RIGHT              919
+#define TURRET_CENTER             967 
 #endif
 
 #define TURRET_NONE               0
