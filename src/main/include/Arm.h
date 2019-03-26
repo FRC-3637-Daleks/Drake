@@ -25,7 +25,7 @@ using namespace std;
 #define lowArmLength              812.8
 #define highArmLength             1079.5
 #define clawLength                228.6
-#define turretOffset              30.48
+#define turretOffset              33    //Old value: 30.48
 
 #define defaultX                  300 // able to change this
 #define cargoHatchHeight          298
@@ -51,7 +51,7 @@ using namespace std;
 
 #ifdef RED_BOT
 #define TURRET_LEFT               998
-#define TURRET_RIGHT              453
+#define TURRET_RIGHT              410
 #define TURRET_CENTER             718.5
 #else
 #define TURRET_LEFT               1001

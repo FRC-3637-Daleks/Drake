@@ -145,10 +145,12 @@ Arm::Tick(XboxController *xbox, POVButton *dPad[])
             move = false;
         }
     } else if (xbox->GetTriggerAxis(GenericHID::JoystickHand::kRightHand) > .1) {
-        x = startPositionX;
-        y = startPositionY;
-        startPosition = true;
-        turretPosition = TURRET_CENTER;
+        // x = startPositionX;
+        // y = startPositionY;
+        // startPosition = true;
+        // turretPosition = TURRET_CENTER;
+        turretMove *= .85 / .5;
+        move = false;
     } else {
         move = false;
         float shoulderAdd = (DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .4) * .02),
@@ -261,23 +263,6 @@ Arm::computeShoulderPosition(double angle)
 #endif
 }
 
-//need to find the range
-bool
-Arm::validShoulderPosition(double pos)
-{
-#ifdef RED_BOT
-    if((pos < 100.0) || (pos > 700.0)) { 
-        return false;
-    }
-    return true;
-#else
-    if((pos < 100.0) || (pos > 700.0)) {
-        return false;
-    }
-    return true;
-#endif
-}
-
 bool
 Arm::Within30InchLimit(float turretAngle) {
     float xTry = abs(armBaseFrontX / cos(abs(turretAngle))),
@@ -285,25 +270,12 @@ Arm::Within30InchLimit(float turretAngle) {
 	      x0 = lowArmLength * cos(computeShoulderAngle()) + highArmLength
             * cos(computeShoulderAngle() + computeElbowAngle() - M_PI) + clawLength;
 	if (xTry < yTry) {
-        SmartDashboard::PutNumber("CALC_X", (x0 * cos(abs(turretAngle)) - armBaseFrontX + turretOffset) / 25.4);
+       //SmartDashboard::PutNumber("CALC_X", (x0 * cos(abs(turretAngle)) - armBaseFrontX + turretOffset) / 25.4);
 		return (x0 * cos(abs(turretAngle)) - armBaseFrontX + turretOffset) < 711;
 	} else {
-        SmartDashboard::PutNumber("CALC_X", (x0 * cos(M_PI / 2 - abs(turretAngle)) - armBaseSideX + turretOffset) / 25.4);
+        //SmartDashboard::PutNumber("CALC_X", (x0 * cos(M_PI / 2 - abs(turretAngle)) - armBaseSideX + turretOffset) / 25.4);
 		return (x0 * cos(M_PI / 2 - abs(turretAngle)) - armBaseSideX + turretOffset) < 711;
 	}
-}
-//Took this out of setMotors
-//Could have caused 30 inch limit to act up
-void
-Arm::maxOutMotor()
-{ 
-    if(m_shoulderMotor->GetOutputCurrent() > 40.0 || m_elbowMotor->GetOutputCurrent() > 40.0 || m_turretMotor->GetOutputCurrent() > 40.0) {
-        m_shoulderMotor->Set(0.0);
-        m_elbowMotor->Set(0.0);
-        m_turretMotor->Set(0.0);
-    } else {
-        SetMotors();
-    }
 }
 
 void
@@ -327,10 +299,13 @@ Arm::SetMotors(float overrideAllow)
                 elbowAngleTestMem = computeElbowAngle();
                 shoulderAngleTestMem = computeShoulderAngle();
             } else {
-                shoulderAngle = shoulderAngleTestMem;
+                if(shoulderAngle < shoulderAngleTestMem)
+                    shoulderAngle = shoulderAngleTestMem;
                 elbowAngle = elbowAngleTestMem;
             }
         }
+        startPosition = false;
+        startPositionReal = false;
         float yHeight = armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI);
         if (startPosition) {
             // if we cannot move to start position safely
@@ -367,11 +342,10 @@ Arm::SetMotors(float overrideAllow)
                     if(validElbowPosition(elbowPosition)) {
                         m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, elbowPosition);
                     }
-                    if(validShoulderPosition(shoulderPosition)) {
-                        HardPID(m_shoulderMotor, m_shoulderPot->Get(), shoulderPosition, .005, .001);
-                        // m_shoulderController->SetSetpoint(shoulderPosition);
-                        // m_shoulderController->SetEnabled(true);
-                    }
+                    
+                    HardPID(m_shoulderMotor, m_shoulderPot->Get(), shoulderPosition, .005, .001);
+                    // m_shoulderController->SetSetpoint(shoulderPosition);
+                    // m_shoulderController->SetEnabled(true);
                 }
                 if (turretPosition != TURRET_NONE) {
                     HardPID(m_turretMotor, m_turretMotor->GetSelectedSensorPosition(0), turretPosition, 20, 5);
@@ -425,16 +399,16 @@ bool
 Arm::HardPID(WPI_TalonSRX *motor, float currentPosition, float finalPosition, float fastThreshold, float slowThreshold) {
     if (abs(currentPosition - finalPosition) > fastThreshold) {
         if (currentPosition > finalPosition) {
-            motor->Set(.8);
+            motor->Set(.2);
         } else {
-            motor->Set(-.8);
+            motor->Set(-.2);
         }
     } else {
         if (abs(currentPosition - finalPosition) > slowThreshold) {
             if (currentPosition > finalPosition) {
-                motor->Set(.2);
+                motor->Set(.1);
             } else {
-                motor->Set(-.2);
+                motor->Set(-.1);
             }
         } else {
             motor->Set(0);
@@ -467,11 +441,11 @@ Arm::printInfo()
     SmartDashboard::PutNumber("Turret Angle", radsToDegrees(computeTurretAngle()));
     SmartDashboard::PutNumber("Shoulder Angle", radsToDegrees(computeShoulderAngle()));
     SmartDashboard::PutNumber("Elbow Angle", radsToDegrees(computeElbowAngle()));
-    SmartDashboard::PutNumber("Preset X", mmToInches(curX));
-    SmartDashboard::PutNumber("Preset Y", mmToInches(curY));
-    SmartDashboard::PutNumber("Preset Shoulder", radsToDegrees(shoulderAngle));
-    SmartDashboard::PutNumber("Preset Elbow", radsToDegrees(elbowAngle));
-
+   //SmartDashboard::PutNumber("Preset X", mmToInches(curX));
+   //SmartDashboard::PutNumber("Preset Y", mmToInches(curY));
+   //SmartDashboard::PutNumber("Preset Shoulder", radsToDegrees(shoulderAngle));
+   //SmartDashboard::PutNumber("Preset Elbow", radsToDegrees(elbowAngle));
+    
     SmartDashboard::PutBoolean("Within 30\" range?", Within30InchLimit(computeTurretAngle()));
 }
 
