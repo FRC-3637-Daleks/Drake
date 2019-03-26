@@ -395,33 +395,37 @@ DalekDrive::DriveOk()
 //Use SetLeftRightMotorOutputs(double leftOutput, double rightOutput) instead of using these single ones
 void
 DalekDrive::DriveBaseSquare(int leftSensor, int rightSensor) {
-	if (LidarInRange (leftSensor, rightSensor)) {
-		if (rightSensor + LidarError > leftSensor || rightSensor - LidarError > leftSensor) {
-			//Turn left
-			SetLeftRightMotorOutputs(PositiveMotorSpeed, NegativeMotorSpeed);
+	#ifdef USE_LIDAR
+		if (LidarInRange (leftSensor, rightSensor)) {
+			if (rightSensor + LidarError > leftSensor || rightSensor - LidarError > leftSensor) {
+				//Turn left
+				SetLeftRightMotorOutputs(PositiveMotorSpeed, NegativeMotorSpeed);
+			}
+			else if (leftSensor + LidarError > rightSensor || leftSensor - LidarError > rightSensor) {
+				//Turn Right
+				SetLeftRightMotorOutputs(NegativeMotorSpeed, PositiveMotorSpeed);
+			}
+			else {
+				//STOP!
+				SetLeftRightMotorOutputs(NullMotorSpeed, NullMotorSpeed);
+			}
+			SmartDashboard::PutNumber("Left Motor Master", m_leftMotor[FRONT]->Get());
+			SmartDashboard::PutNumber("Left Motor Slave", m_leftMotor[REAR]->Get());
+			SmartDashboard::PutNumber("Left Motor Master", m_leftMotor[FRONT]->Get());
+			SmartDashboard::PutNumber("Left Motor Slave", m_leftMotor[REAR]->Get());
 		}
-		else if (leftSensor + LidarError > rightSensor || leftSensor - LidarError > rightSensor) {
-			//Turn Right
-			SetLeftRightMotorOutputs(NegativeMotorSpeed, PositiveMotorSpeed);
-		}
-		else {
-			//STOP!
-			SetLeftRightMotorOutputs(NullMotorSpeed, NullMotorSpeed);
-		}
-		SmartDashboard::PutNumber("Left Motor Master", m_leftMotor[FRONT]->Get());
-		SmartDashboard::PutNumber("Left Motor Slave", m_leftMotor[REAR]->Get());
-		SmartDashboard::PutNumber("Left Motor Master", m_leftMotor[FRONT]->Get());
-		SmartDashboard::PutNumber("Left Motor Slave", m_leftMotor[REAR]->Get());
-	}
+	#endif
 }
 
 bool
 DalekDrive::LidarInRange (int sensorOne, int sensorTwo) {
-	if (sensorOne >= 1000 || sensorTwo >= 1000) {
-		SmartDashboard::PutBoolean("Lidar Status", 0);
-		return false;
-	}
-	//If less than 1000
-	SmartDashboard::PutBoolean("Lidar Status", 1);
-	return true;
+	#ifdef USE_LIDAR
+		if (sensorOne >= 1000 || sensorTwo >= 1000) {
+			SmartDashboard::PutBoolean("Lidar Status", 0);
+			return false;
+		}
+		//If less than 1000
+		SmartDashboard::PutBoolean("Lidar Status", 1);
+		return true;
+	#endif
 }
