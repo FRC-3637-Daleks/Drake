@@ -63,9 +63,6 @@ Arm::ArmInit()
     shoulderOverride = false;
     init = true;
 
-    shoulderOverride = false;
-    init = true;
-
     //Starting position
     curX = 100; //609.6
     curY = 300; //609.6
@@ -93,6 +90,7 @@ Arm::DeadZone(float input, float range)
 void
 Arm::Tick(XboxController *xbox, POVButton *dPad[])
 {   
+    SmartDashboard::PutBoolean("To Right B?", false);
     float turretMove = DeadZone(xbox->GetX(GenericHID::JoystickHand::kRightHand), .3) * .5;
     float x = curX, y = curY;
     bool move = true, overrideAllow = false;
@@ -118,6 +116,7 @@ Arm::Tick(XboxController *xbox, POVButton *dPad[])
             x = ballLoadX;
             y = ballLoadHeight; 
         } else if (dPad[R]->Get()) {
+            SmartDashboard::PutBoolean("To Right B?", true);
             x = discLoadX;
             y = discLoadHeight;
         } else {
@@ -278,10 +277,10 @@ Arm::Within30InchLimit(float turretAngle) {
             * cos(computeShoulderAngle() + computeElbowAngle() - M_PI) + clawLength;
 	if (xTry < yTry) {
        SmartDashboard::PutNumber("CALC_X", (x0 * cos(abs(turretAngle)) - armBaseFrontX + turretOffset) / 25.4);
-		return (x0 * cos(abs(turretAngle)) - armBaseFrontX + turretOffset) < 656; // About 27 inches
+		return (x0 * cos(abs(turretAngle)) - armBaseFrontX + turretOffset) < 686; // used to be about 27 inches (656)
 	} else {
         SmartDashboard::PutNumber("CALC_X", (x0 * cos(M_PI / 2 - abs(turretAngle)) - armBaseSideX + turretOffset) / 25.4);
-		return (x0 * cos(M_PI / 2 - abs(turretAngle)) - armBaseSideX + turretOffset) < 656; // About 27 inches
+		return (x0 * cos(M_PI / 2 - abs(turretAngle)) - armBaseSideX + turretOffset) < 686; // used to be about 27 inches (656)
 	}
 }
 
@@ -317,6 +316,7 @@ Arm::SetMotors(float overrideAllow)
         }
         startPosition = false;
         startPositionReal = false;
+        // the two lines above disable start position
         float yHeight = armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI);
         if (startPosition) {
             // if we cannot move to start position safely
@@ -344,18 +344,19 @@ Arm::SetMotors(float overrideAllow)
             } else {
                 elbowPosition = computeElbowPosition(elbowAngle);
                 shoulderPosition = computeShoulderPosition(shoulderAngle);
+                SmartDashboard::PutBoolean("need to back it up?", shoulderOverride);
                 if (shoulderOverride && !init) {
                     if (HardPID(m_shoulderMotor, m_shoulderPot->Get(), computeShoulderPosition(SAFE_SHOULDER_ANGLE), .005, .001)) {
                         m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, elbowPosition);
                         shoulderOverride = false;
                     }
                 } else {
-                    if(validElbowPosition(elbowPosition) && HardPID(m_shoulderMotor, m_shoulderPot->Get(), shoulderPosition, .005, .001)) {
+                    // if(validElbowPosition(elbowPosition) && HardPID(m_shoulderMotor, m_shoulderPot->Get(), shoulderPosition, .005, .001)) {
                         m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, elbowPosition);
-                    }
+                    // }
                     // now the shoulder always goes moves first
 
-                    // HardPID(m_shoulderMotor, m_shoulderPot->Get(), shoulderPosition, .005, .001);
+                    HardPID(m_shoulderMotor, m_shoulderPot->Get(), shoulderPosition, .005, .001);
                     // m_shoulderController->SetSetpoint(shoulderPosition);
                     // m_shoulderController->SetEnabled(true);
                 }
@@ -417,11 +418,19 @@ Arm::HardPID(WPI_TalonSRX *motor, float currentPosition, float finalPosition, fl
     #endif
     SmartDashboard::PutNumber("Turret Error", abs(currentPosition - finalPosition));
     if (abs(currentPosition - finalPosition) > fastThreshold) {
+        #ifndef RED_BOT
         if (currentPosition > finalPosition) {
             motor->Set(.2);
         } else {
             motor->Set(-.2);
         }
+        #else 
+        if (currentPosition > finalPosition) {
+            motor->Set(.7);
+        } else {
+            motor->Set(-.7);
+        }
+        #endif
     } else {
         if (abs(currentPosition - finalPosition) > slowThreshold) {
             #ifdef RED_BOT
@@ -432,9 +441,9 @@ Arm::HardPID(WPI_TalonSRX *motor, float currentPosition, float finalPosition, fl
             }
             #else
             if (currentPosition > finalPosition) {
-                motor->Set(.4);
+                motor->Set(.5);
             } else {
-                motor->Set(-.4);
+                motor->Set(-.5);
             }
             #endif
         } else {
@@ -444,7 +453,8 @@ Arm::HardPID(WPI_TalonSRX *motor, float currentPosition, float finalPosition, fl
     }
     return false;
 }
-
+// elbow angle: 8.042
+// shoulder angle: 111.17
 void 
 Arm::printInfo()
 {
@@ -458,7 +468,7 @@ Arm::printInfo()
    // SmartDashboard::PutNumber("Turret position", m_turretMotor->GetSelectedSensorPosition(0));
 
    // SmartDashboard::PutNumber("Elbow position", m_elbowMotor->GetSelectedSensorPosition(0));
-   // SmartDashboard::PutNumber("Elbow close loop error", m_elbowMotor->GetClosedLoopError(0));
+   SmartDashboard::PutNumber("Elbow close loop error", m_elbowMotor->GetClosedLoopError(0));
  
    // SmartDashboard::PutNumber("Shoulder position", m_shoulderPot->Get());
     // SmartDashboard::PutNumber("Shoulder close loop error", m_shoulderController->GetError());

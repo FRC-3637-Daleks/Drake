@@ -30,7 +30,7 @@ using namespace std;
 #define defaultX                  300 // able to change this
 #define cargoHatchHeight          298
 #define cargoBallHeight           1003
-#define cargoBallLength           508
+#define cargoBallLength           400
 #define rocketHatchLowHeight      298
 #define rocketBallLowHeight       749
 #define rocketHatchMiddleHeight   1048
