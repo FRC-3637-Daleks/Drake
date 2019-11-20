@@ -6,7 +6,7 @@
 #include <frc/XboxController.h>
 
 #include <frc/smartdashboard/SendableChooser.h>
-#include "frc/smartdashboard/SmartDashBoard.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 
 #define servoOpen          90
 #define servoClosed        125

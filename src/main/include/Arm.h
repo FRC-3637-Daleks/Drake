@@ -14,7 +14,7 @@
 #include <frc/Joystick.h>
 
 #include <frc/smartdashboard/SendableChooser.h>
-#include "frc/smartdashboard/SmartDashBoard.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 
 using namespace rev;
 using namespace std;

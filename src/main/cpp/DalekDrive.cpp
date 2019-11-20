@@ -1,5 +1,5 @@
 #include <Drake.h>
-#include <frc/JoyStick.h>
+#include <frc/Joystick.h>
 
 using namespace frc;
 using namespace rev;
